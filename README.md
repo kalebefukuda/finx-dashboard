@@ -1,53 +1,53 @@
-# MyMoney - Dashboard Financeiro Pessoal
+# FinX - Personal Finance Dashboard
 
-## 📌 Sobre o Projeto
-O **MyMoney** é um dashboard financeiro pessoal desenvolvido para ajudar usuários a monitorar suas finanças de forma simples e eficiente. O projeto segue um estilo **moderno e minimalista**, inspirado em plataformas como **Investidor10**.
+## 📌 About the Project
+**FinX** is a personal finance dashboard designed to help users monitor their finances in a simple and efficient way. The project follows a **modern and minimalist** style, inspired by platforms like **Investidor10**.
 
-## 🚀 Tecnologias Utilizadas
+## 🚀 Technologies Used
+
 ### **Front-end:**
-- **Next.js** - Framework React para SSR e SSG
-- **Tailwind CSS v4** - Estilização rápida e otimizada
+- **Next.js** – React framework for SSR and SSG
+- **Tailwind CSS v4** – Fast and optimized styling
 
 ### **Back-end:**
-- **Next.js API Routes** - Para criação de endpoints internos
-- **Prisma** - ORM para interagir com o banco de dados
+- **Next.js API Routes** – For internal API endpoints
+- **Prisma** – ORM for database interaction
 
-### **Banco de Dados:**
-- **Supabase** - Banco de dados PostgreSQL hospedado na nuvem
+### **Database:**
+- **Supabase** – Cloud-hosted PostgreSQL database
 
-## ⚡ Por que usar Next.js API Routes ao invés de Fastify?
-O **Next.js** já vem com suporte a **API Routes**, permitindo criar um backend diretamente dentro do projeto, sem precisar configurar um servidor extra. Como o **MyMoney** é um dashboard financeiro pessoal, onde a API serve apenas ao próprio Next.js, a abordagem com API Routes é suficiente e simplifica o desenvolvimento.
+## ⚡ Why use Next.js API Routes instead of Fastify?
+**Next.js** comes with built-in support for **API Routes**, allowing you to create a backend directly within the project without setting up an external server. Since **FinX** is a personal finance dashboard where the API serves only the Next.js frontend, API Routes are a simple and efficient solution.
 
-### ✅ **Vantagens de usar Next.js API Routes:**
-- 🚀 **Mais simples** → Tudo em um só projeto, sem necessidade de um backend separado.
-- 🛠️ **Facilidade de deploy** → Ótima compatibilidade com Vercel.
-- 🔄 **Menos manutenção** → Sem necessidade de gerenciar outro servidor.
+### ✅ **Advantages of using Next.js API Routes:**
+- 🚀 **Simpler setup** → All-in-one project, no need for a separate backend.
+- 🛠️ **Easy deployment** → Great compatibility with Vercel.
+- 🔄 **Less maintenance** → No need to manage an additional server.
 
-Se, no futuro, houver necessidade de maior performance ou escalabilidade, podemos considerar um servidor dedicado como **Fastify**.
+If greater performance or scalability is needed in the future, we can consider migrating to a dedicated server with **Fastify**.
 
-## 🔧 Configuração do Projeto
-### **1️⃣ Instalar as dependências**
+## 🔧 Project Setup
+### **1️⃣ Install dependencies**
 ```sh
 npm install
 ```
-### **2️⃣ Configurar o ambiente**
-Crie um arquivo `.env.local` e adicione as credenciais do Supabase:
+### **2️⃣Configure environment variables**
+Create a  `.env.local` file and add your Supabase credentials:
 ```env
 NEXT_PUBLIC_SUPABASE_URL="https://seu-supabase-url.supabase.co"
 NEXT_PUBLIC_SUPABASE_ANON_KEY="sua-anon-key-aqui"
 DATABASE_URL="postgresql://seu-usuario:senha@host:porta/seu-banco"
 ```
-### **3️⃣ Rodar o servidor localmente**
+### **3️⃣ Run the development server**
 ```sh
 npm run dev
 ```
-O projeto estará acessível em **http://localhost:3000**.
 
-## 📌 Próximos Passos
-- Implementação do sistema de autenticação com Supabase
-- Adição de gráficos interativos para visualização financeira
-- Integração com APIs externas para importação automática de dados
+## 📌  Next Steps
+- Implement authentication system with Supabase
+- Add interactive financial charts
+- Integrate external APIs for automatic data import
 
 ---
-✉️ Caso tenha dúvidas, entre em contato! 🚀
+✉️ Have any questions? Feel free to reach out! 🚀
 
