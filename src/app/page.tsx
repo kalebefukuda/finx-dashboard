@@ -1,7 +1,29 @@
+"use client"
 import Image from "next/image";
 import { ArrowRight } from 'lucide-react';
 import Link from "next/link";
-export default function Home() {  return (
+import { useEffect, useState  } from "react"
+import { useRouter } from "next/navigation"
+
+export default function Home() {
+  const router = useRouter()
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+
+    const hash = window.location.hash
+    const params = new URLSearchParams(hash.substring(1))
+    const type = params.get("type")
+
+    if (type === "recovery") {
+      router.replace("/reset-password" + hash)
+    }
+  }, [router])
+
+  if (!isClient) return null
+    return (
+
     <div className="min-h-screen px-10">
       <header className="flex justify-between items-center px-10 py-4">
         <nav className="flex space-x-8">

@@ -96,7 +96,7 @@ export default function SignIn() {
                 <Label htmlFor="password">Password</Label>
                 <div className="text-sm">
                   <Link
-                    href="/restore-password"
+                    href="/forgot-password"
                     className="font-medium text-[12px] text-primary-hover-dark transition duration-300 hover:text-primary-hover-light"
                   >
                     Forgot password?
