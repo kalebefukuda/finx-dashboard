@@ -33,16 +33,14 @@ export default function Home() {
         </nav>
         <div className="text-xl font-bold text-gray-900">
           <Image
-            src="/images/finx-logo.png"
+            src="/images/finx-logo.svg"
             width={63}
             height={24}
             alt="Picture of the author"
           />
         </div>
         <div className="w-50 flex justify-end">
-          <button className="border border-gray-700 px-4 py-2 rounded-lg cursor-pointer hover:bg-gray-100">
-            <Link href="/sign-in">Sign in</Link>
-          </button>
+            <Link className="border-1 border-primary-light text-primary-light px-4 py-2 rounded-sm cursor-pointer transition duration-300 hover:bg-primary-hover-light hover:text-white" href="/sign-in">Sign in</Link>
         </div>
         
       </header>
@@ -50,15 +48,15 @@ export default function Home() {
       <section className="flex md:flex-row items-center justify-between md:px-20 py-34 w-full">
         <div className="max-w-lg flex flex-col gap-10 z-10">
           <h1 className="text-6xl font-semibold text-gray-900">
-            Manage your <span className="text-green-600">money</span> with ease
+            Manage your <span className="text-primary-light">money</span> with ease
           </h1>
           <p className="text-gray-600 mt-4 w-100">
             It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.
           </p>
-          <button className="flex justify-center items-center gap-3 mt-6  bg-green-600 text-white px-6 py-3 rounded-lg w-[200px] transition duration-100 hover:bg-green-500 cursor-pointer">
+          <Link href='/sign-in' className="flex justify-center items-center gap-3 mt-6  bg-primary-light text-white px-6 py-3 rounded-lg w-[200px] transition duration-200 hover:bg-primary-hover-light cursor-pointer">
             Get Started
             <ArrowRight size={20} />
-          </button>
+          </Link>
         </div>
 
         <div className="flex justify-end w-full right-0 absolute mt-40">

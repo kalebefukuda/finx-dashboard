@@ -18,7 +18,7 @@ const loginSchema = z.object({
     .min(1, "Name is required")
     .regex(/^[A-Za-zÀ-ÿ\s]+$/, "Only letters and spaces allowed"),
   email: z.string().email("Invalid email"),
-  password: z.string(),
+  password: z.string().min(6, "Password is required"),
 })
 
 type LoginFormValues = z.infer<typeof loginSchema>
@@ -84,14 +84,14 @@ export default function SignUp() {
 
 
   return (
-    <div className="flex px-10 py-4">
+    <div className="flex flex-col px-10 py-4">
 
       <div className="flex px-2 mt-2">
         <Link href="/">
-          <Image src="/images/finx-logo.png" width={63} height={24} alt="FinX logo" />
+          <Image src="/images/finx-logo.svg" width={63} height={24} alt="FinX logo" />
         </Link>
       </div>
-      <div className="flex min-h-full h-screen flex-1 flex-col justify-center">
+      <div className="flex min-h-full h-screen flex-col justify-center">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm flex flex-col justify-center items-center">
           <h2 className="mt-10 text-center text-3xl font-bold tracking-tight text-gray-900">Create your account</h2>
         </div>
@@ -100,17 +100,21 @@ export default function SignUp() {
           <form onSubmit={handleSubmit(handleSignUp)} className="space-y-6">
 
           <div>
-              <div className="mt-2 flex flex-col gap-3">
-                <Label htmlFor="">Name</Label>
+            <div className="flex items-center justify-between">
+            <Label htmlFor="">Name</Label>
+            </div>
+              <div className="mt-2">
                 <Input type="name" id="name" placeholder="" {...register("name")} />
-                {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
+                {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
               </div>
             </div>
             <div>
-              <div className="mt-2 flex flex-col gap-3">
+              <div className="flex items-center justify-between">
                 <Label htmlFor="email">Email address</Label>
+              </div>
+              <div className="mt-2">
                 <Input type="email" id="email" placeholder="" {...register("email")} />
-                {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
+                {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
               </div>
             </div>
 
@@ -120,7 +124,7 @@ export default function SignUp() {
               </div>
               <div className="mt-2">
                 <Input type="password" id="password" placeholder="" {...register("password")} />
-                {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
+                {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
               </div>
             </div>
 

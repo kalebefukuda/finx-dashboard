@@ -9,6 +9,18 @@ import { Separator } from "@/components/ui/separator";
 import { toast, Toaster } from "sonner";
 import Link from "next/link";
 import Image from "next/image";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction
+} from "@/components/ui/alert-dialog"
+
 
 export default function ResetPasswordPage() {
   const router = useRouter();
@@ -53,24 +65,24 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <div className="flex px-10 py-4">
+    <div className="flex flex-col px-10 py-4">
       <div className="flex px-2 mt-2">
         <Link href="/">
-          <Image src="/images/finx-logo.png" width={63} height={24} alt="FinX logo" />
+          <Image src="/images/finx-logo.svg" width={63} height={24} alt="FinX logo" />
         </Link>
       </div>
 
-      <div className="flex min-h-full h-screen flex-1 flex-col justify-center">
+      <div className="flex min-h-full h-screen flex-col justify-center">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm flex flex-col justify-center items-center">
           <h2 className="mt-10 text-center text-3xl font-bold tracking-tight text-gray-900">
-            Redefinir senha
+            Reset Password
           </h2>
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
           <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); handleUpdatePassword(); }}>
             <div className="flex flex-col gap-3">
-              <Label htmlFor="password">Nova senha</Label>
+              <Label htmlFor="password">New password</Label>
               <Input
                 type="password"
                 id="password"
@@ -80,7 +92,7 @@ export default function ResetPasswordPage() {
             </div>
 
             <div className="flex flex-col gap-3">
-              <Label htmlFor="confirm">Confirmar nova senha</Label>
+              <Label htmlFor="confirm">Confirm you password</Label>
               <Input
                 type="password"
                 id="confirm"
@@ -90,17 +102,37 @@ export default function ResetPasswordPage() {
             </div>
 
             <div>
-              <button
-                type="submit"
-                disabled={loading}
-                className={`flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold text-white shadow-xs transition duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ${
-                  loading
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-primary-light hover:bg-primary-hover-light"
-                }`}
-              >
-                {loading ? "Salvando..." : "Salvar nova senha"}
-              </button>
+            <AlertDialog>
+  <AlertDialogTrigger asChild>
+    <button
+      type="button"
+      disabled={loading}
+      className={`flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold text-white shadow-xs transition duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 cursor-pointer ${
+        loading
+          ? "bg-gray-400 cursor-not-allowed"
+          : "bg-primary-light hover:bg-primary-hover-light"
+      }`}
+    >
+      {loading ? "Saving..." : "Reset my password"}
+    </button>
+  </AlertDialogTrigger>
+
+  <AlertDialogContent>
+    <AlertDialogHeader>
+      <AlertDialogTitle>Confirm reset?</AlertDialogTitle>
+      <AlertDialogDescription>
+        This action will update your current password. Make sure your new password is correct.
+      </AlertDialogDescription>
+    </AlertDialogHeader>
+    <AlertDialogFooter>
+      <AlertDialogCancel>Cancel</AlertDialogCancel>
+      <AlertDialogAction onClick={handleUpdatePassword}>
+        Confirm
+      </AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
+
             </div>
           </form>
 
@@ -111,12 +143,12 @@ export default function ResetPasswordPage() {
           </div>
 
           <p className="mt-10 text-center text-sm text-gray-500">
-            Já tem uma conta?{" "}
+            Already have an account?{" "}
             <Link
               href="/sign-in"
               className="font-semibold text-primary-hover-dark hover:text-primary-hover-light transition duration-300"
             >
-              Entrar
+              Sign in
             </Link>
           </p>
         </div>
