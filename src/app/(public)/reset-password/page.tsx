@@ -68,7 +68,7 @@ export default function ResetPasswordPage() {
     <div className="flex flex-col px-10 py-4">
       <div className="flex px-2 mt-2">
         <Link href="/">
-          <Image src="/images/finx-logo.svg" width={63} height={24} alt="FinX logo" />
+          <Image src="/images/finx-logo.svg" width={70} height={24} alt="FinX logo" />
         </Link>
       </div>
 
@@ -107,7 +107,7 @@ export default function ResetPasswordPage() {
     <button
       type="button"
       disabled={loading}
-      className={`flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold text-white shadow-xs transition duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 cursor-pointer ${
+      className={`flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-medium text-white shadow-xs transition duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 cursor-pointer h-9 items-center ${
         loading
           ? "bg-gray-400 cursor-not-allowed"
           : "bg-primary-light hover:bg-primary-hover-light"

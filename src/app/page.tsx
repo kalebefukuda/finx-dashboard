@@ -24,7 +24,7 @@ export default function Home() {
   if (!isClient) return null
     return (
 
-    <div className="min-h-screen px-10">
+    <div className="min-h-screen px-10 flex flex-col  ">
       <header className="flex justify-between items-center px-10 py-4">
         <nav className="flex space-x-8">
           <a href="#home" className="text-gray-700 hover:text-gray-900">Home</a>
@@ -34,7 +34,7 @@ export default function Home() {
         <div className="text-xl font-bold text-gray-900">
           <Image
             src="/images/finx-logo.svg"
-            width={63}
+            width={70}
             height={24}
             alt="Picture of the author"
           />
@@ -62,7 +62,7 @@ export default function Home() {
         <div className="flex justify-end w-full right-0 absolute mt-40">
           <div className="relative w-[940px] h-[700] ">
             <Image
-              src="/images/finx-mockup.svg"
+              src="/images/Group59.svg"
               width={1600}
               height={800}
               alt="FinX Mockup"
@@ -73,9 +73,48 @@ export default function Home() {
         
       </section>
 
-      <section className="flex mt-50 justify-center" id="about">
-        <h1>about section</h1>
-      </section>
+      <section className="mt-40 py-24 md:py-32">
+      <div className="container mx-auto px-4 md:px-6">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl font-semibold text-gray-900 mb-4">How it works</h2>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            With lots of unique blocks, you can easily build a page without coding. Build your next landing page.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          {/* Step 1 */}
+          <div className="bg-white p-8 rounded-lg border border-gray-100 relative hover:shadow-[0_0_30px_rgba(0,187,129,0.2)] transition duration-300">
+            <div className="absolute top-8 left-8 w-8 h-8 bg-black rounded-full flex items-center justify-center text-white font-medium text-sm">
+              1
+            </div>
+            <div className="pt-12">
+              <p className="font-medium text-gray-900">Sign up for creating your first online store with ease.</p>
+            </div>
+          </div>
+
+          {/* Step 2 - with glow effect */}
+          <div className="bg-white p-8 rounded-lg border border-gray-100 relative hover:shadow-[0_0_30px_rgba(0,187,129,0.2)] transition duration-300">
+            <div className="absolute top-8 left-8 w-8 h-8 bg-black rounded-full flex items-center justify-center text-white font-medium text-sm">
+              2
+            </div>
+            <div className="pt-12">
+              <p className="font-medium text-gray-900">Add your products to your store and customize.</p>
+            </div>
+          </div>
+
+          {/* Step 3 */}
+          <div className="bg-white p-8 rounded-lg border border-gray-100 relative hover:shadow-[0_0_30px_rgba(0,187,129,0.2)] transition duration-300">
+            <div className="absolute top-8 left-8 w-8 h-8 bg-black rounded-full flex items-center justify-center text-white font-medium text-sm">
+              3
+            </div>
+            <div className="pt-12">
+              <p className="font-medium text-gray-900">Sell and earn as much as you can. Grow fast.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
     </div>
   );

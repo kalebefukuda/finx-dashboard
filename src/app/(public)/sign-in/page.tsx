@@ -73,7 +73,7 @@ export default function SignIn() {
 
       <div className="flex px-2 mt-2">
         <Link href="/">
-          <Image src="/images/finx-logo.svg" width={63} height={24} alt="FinX logo" />
+          <Image src="/images/finx-logo.svg" width={70} height={24} alt="FinX logo" />
         </Link>
       </div>
       <div className="flex min-h-full h-screen flex-col justify-center items-center">
@@ -85,7 +85,7 @@ export default function SignIn() {
           <form onSubmit={handleSubmit(handleLogin)} className="space-y-6">
             <div>
               <div className="flex items-center justify-between">
-                <Label htmlFor="email">Email address</Label>
+                <Label htmlFor="email">Email</Label>
               </div>
               <div className="mt-2">
                 
@@ -116,7 +116,7 @@ export default function SignIn() {
               <button
                 type="submit"
                 disabled={loading}
-                className={`flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold text-white shadow-xs transition duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 cursor-pointer ${
+                className={`flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-medium text-white shadow-xs transition duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 cursor-pointer h-9 items-center ${
                   loading ? "bg-gray-400 cursor-not-allowed" : "bg-primary-light hover:bg-primary-hover-light"
                 }`}
               >
