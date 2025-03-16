@@ -11,6 +11,7 @@ import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { supabase } from "@/lib/supabase/supabaseClient"
 import { Toaster, toast } from "sonner"
+import { useMountedTheme } from "@/hooks/use-mounted-theme"
 
 const loginSchema = z.object({
     name: z
@@ -33,6 +34,8 @@ export default function SignUp() {
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
   })
+
+  const { theme, setTheme, mounted } = useMountedTheme()
 
   const handleSignUp = async (data: LoginFormValues) => {
     setLoading(true)
@@ -88,12 +91,19 @@ export default function SignUp() {
 
       <div className="flex px-2 mt-2">
         <Link href="/">
-          <Image src="/images/finx-logo.svg" width={70} height={24} alt="FinX logo" />
+          {mounted && (
+            <Image
+              src={theme === "dark" ? "/images/finx-logo-light.svg" : "/images/finx-logo.svg"}
+              width={70}
+              height={24}
+              alt="FinX Logo"
+            />
+          )}        
         </Link>
       </div>
       <div className="flex min-h-full h-screen flex-col justify-center">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm flex flex-col justify-center items-center">
-          <h2 className="mt-10 text-center text-3xl font-bold tracking-tight text-gray-900">Create your account</h2>
+          <h2 className="mt-10 text-center text-3xl font-bold tracking-tight text-[var(--foreground)]">Create Your Account</h2>
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
@@ -147,7 +157,7 @@ export default function SignUp() {
                 <Separator className="w-full" />
               </div>
               <div className="relative flex justify-center text-xs">
-                <span className="bg-white px-2 text-gray-500">Or with</span>
+                <span className="bg-[var(--color-background-separator)] px-2 text-gray-500">Or with</span>
               </div>
             </div>
 

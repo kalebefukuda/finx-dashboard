@@ -20,26 +20,35 @@ import {
   BarChart3,
   Target,
   LineChart,
-  Timer,
+  Bot,
 } from "lucide-react"
+import { useMountedTheme } from "@/hooks/use-mounted-theme"
 
 const menuItems = [
   { title: "Dashboard", icon: Home, href: "/" },
-  { title: "Lançamentos", icon: ListOrdered, href: "/lancamentos" },
+  { title: "Lançamentos", icon: ListOrdered, href: "/movements" },
   { title: "Gráficos", icon: BarChart3, href: "/graficos" },
-  { title: "Metas", icon: Target, href: "/metas" },
-  { title: "Investimentos", icon: LineChart, href: "/investimentos" },
-  { title: "Orçamento", icon: Timer, href: "/orcamento" },
+  { title: "Metas", icon: Target, href: "/goals" },
+  { title: "Investimentos", icon: LineChart, href: "/investments" },
+  { title: "Análise", icon: Bot, href: "/ai-review" },
 ]
 
 export function CustomSidebar() {
   const pathname = usePathname()
+  const { theme, setTheme, mounted } = useMountedTheme()
 
   return (
     <Sidebar>
       <SidebarHeader>
         <div className="flex items-center gap-2 px-4 py-2">
-          <Image src="/images/finx-logo.svg" width={60} height={24} alt="FinX logo" />
+          {mounted && (
+            <Image
+              src={theme === "dark" ? "/images/finx-logo-light.svg" : "/images/finx-logo.svg"}
+              width={70}
+              height={24}
+              alt="FinX Logo"
+            />
+          )}
         </div>
       </SidebarHeader>
 

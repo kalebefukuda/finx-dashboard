@@ -20,6 +20,7 @@ import {
   AlertDialogCancel,
   AlertDialogAction
 } from "@/components/ui/alert-dialog"
+import { useMountedTheme } from "@/hooks/use-mounted-theme"
 
 
 export default function ResetPasswordPage() {
@@ -27,6 +28,7 @@ export default function ResetPasswordPage() {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
+  const { theme, setTheme, mounted } = useMountedTheme()
 
   useEffect(() => {
     const hash = window.location.hash;
@@ -68,13 +70,20 @@ export default function ResetPasswordPage() {
     <div className="flex flex-col px-10 py-4">
       <div className="flex px-2 mt-2">
         <Link href="/">
-          <Image src="/images/finx-logo.svg" width={70} height={24} alt="FinX logo" />
+         {mounted && (
+            <Image
+              src={theme === "dark" ? "/images/finx-logo-light.svg" : "/images/finx-logo.svg"}
+              width={70}
+              height={24}
+              alt="FinX Logo"
+            />
+          )}
         </Link>
       </div>
 
       <div className="flex min-h-full h-screen flex-col justify-center">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm flex flex-col justify-center items-center">
-          <h2 className="mt-10 text-center text-3xl font-bold tracking-tight text-gray-900">
+          <h2 className="mt-10 text-center text-3xl font-bold tracking-tight text-[var(--foreground)]">
             Reset Password
           </h2>
         </div>

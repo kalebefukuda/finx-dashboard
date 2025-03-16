@@ -11,6 +11,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useMountedTheme } from "@/hooks/use-mounted-theme"
 
 
 const emailSchema = z.object({
@@ -23,6 +24,7 @@ export default function ForgotPassword(){
   const [loading, setLoading] = useState(false)
   const [email,setEmail] = useState("")
   const [message,setMessage] = useState("")
+  const { theme, setTheme, mounted } = useMountedTheme()
 
   const {
     register,
@@ -51,12 +53,19 @@ export default function ForgotPassword(){
     
           <div className="flex px-2 mt-2">
             <Link href="/">
-              <Image src="/images/finx-logo.svg" width={70} height={24} alt="FinX logo" />
+             {mounted && (
+                <Image
+                  src={theme === "dark" ? "/images/finx-logo-light.svg" : "/images/finx-logo.svg"}
+                  width={70}
+                  height={24}
+                  alt="FinX Logo"
+                />
+              )}
             </Link>
           </div>
           <div className="flex min-h-full h-screen flex-col justify-center">
             <div className="sm:mx-auto sm:w-full sm:max-w-sm flex flex-col justify-center items-center">
-              <h2 className="mt-10 text-center text-3xl font-bold tracking-tight text-gray-900">Reset Your Password</h2>
+              <h2 className="mt-10 text-center text-3xl font-bold tracking-tight text-[var(--foreground)]">Reset Your Password</h2>
             </div>
     
             <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
