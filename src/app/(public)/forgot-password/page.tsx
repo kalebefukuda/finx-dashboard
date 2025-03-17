@@ -11,6 +11,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useMountedTheme } from "@/hooks/use-mounted-theme"
 
 
 const emailSchema = z.object({
@@ -23,6 +24,7 @@ export default function ForgotPassword(){
   const [loading, setLoading] = useState(false)
   const [email,setEmail] = useState("")
   const [message,setMessage] = useState("")
+  const { theme, setTheme, mounted } = useMountedTheme()
 
   const {
     register,
@@ -47,49 +49,46 @@ export default function ForgotPassword(){
     setLoading(false);
   };
     return (
-        <div className="flex px-10 py-4">
+        <div className="flex flex-col px-10 py-4">
     
           <div className="flex px-2 mt-2">
             <Link href="/">
-              <Image src="/images/finx-logo.png" width={63} height={24} alt="FinX logo" />
+             {mounted && (
+                <Image
+                  src={theme === "dark" ? "/images/finx-logo-light.svg" : "/images/finx-logo.svg"}
+                  width={70}
+                  height={24}
+                  alt="FinX Logo"
+                />
+              )}
             </Link>
           </div>
-          <div className="flex min-h-full h-screen flex-1 flex-col justify-center">
+          <div className="flex min-h-full h-screen flex-col justify-center">
             <div className="sm:mx-auto sm:w-full sm:max-w-sm flex flex-col justify-center items-center">
-              <h2 className="mt-10 text-center text-3xl font-bold tracking-tight text-gray-900">Reset your password</h2>
+              <h2 className="mt-10 text-center text-3xl font-bold tracking-tight text-[var(--foreground)]">Reset Your Password</h2>
             </div>
     
             <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
               <form className="space-y-6" onSubmit={handleSubmit(handleResetPassword)}>
                 <div>
-                  <div className="mt-2 flex flex-col gap-3">
+                  <div>
                     <Label htmlFor="email">Email</Label>
-                    <Input  type="email" id="email" placeholder="you@example.com" {...register("email")}/>
+                  </div>
+                  <div className="mt-1 flex flex-col gap-3">
+                    <Input type="email" id="email" placeholder="you@example.com" {...register("email")}/>
                     {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
                   </div>
-                </div>
-    
-                <div>
-              <button
-                type="submit"
-                disabled={loading}
-                className={`flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold text-white shadow-xs transition duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ${
-                  loading ? "bg-gray-400 cursor-not-allowed" : "bg-primary-light hover:bg-primary-hover-light"
-                }`}
-              >
-                {loading ? "Sending..." : "Send Reset Email"}
-              </button>
-            </div>
-              </form>
-    
-              <div className="mt-6">
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <Separator className="w-full" />
-                  </div>
-                  
-                </div>
+                </div>         
+                <div>   
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className={`flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-medium text-white shadow-xs transition duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 cursor-pointer h-9 items-center ${
+                      loading ? "bg-gray-400 cursor-not-allowed" : "bg-primary-light hover:bg-primary-hover-light"}`}>
+                      {loading ? "Sending..." : "Send Reset Link"}
+                  </button>
               </div>
+              </form>
     
               <p className="mt-10 text-center text-sm/6 text-gray-500">
                 Already have an account?{" "}

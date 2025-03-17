@@ -11,6 +11,7 @@ import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { supabase } from "@/lib/supabase/supabaseClient"
 import { Toaster, toast } from "sonner"
+import { useMountedTheme } from "@/hooks/use-mounted-theme"
 
 const loginSchema = z.object({
     name: z
@@ -18,7 +19,7 @@ const loginSchema = z.object({
     .min(1, "Name is required")
     .regex(/^[A-Za-zÀ-ÿ\s]+$/, "Only letters and spaces allowed"),
   email: z.string().email("Invalid email"),
-  password: z.string(),
+  password: z.string().min(6, "Password is required"),
 })
 
 type LoginFormValues = z.infer<typeof loginSchema>
@@ -33,6 +34,8 @@ export default function SignUp() {
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
   })
+
+  const { theme, setTheme, mounted } = useMountedTheme()
 
   const handleSignUp = async (data: LoginFormValues) => {
     setLoading(true)
@@ -84,33 +87,44 @@ export default function SignUp() {
 
 
   return (
-    <div className="flex px-10 py-4">
+    <div className="flex flex-col px-10 py-4">
 
       <div className="flex px-2 mt-2">
         <Link href="/">
-          <Image src="/images/finx-logo.png" width={63} height={24} alt="FinX logo" />
+          {mounted && (
+            <Image
+              src={theme === "dark" ? "/images/finx-logo-light.svg" : "/images/finx-logo.svg"}
+              width={70}
+              height={24}
+              alt="FinX Logo"
+            />
+          )}        
         </Link>
       </div>
-      <div className="flex min-h-full h-screen flex-1 flex-col justify-center">
+      <div className="flex min-h-full h-screen flex-col justify-center">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm flex flex-col justify-center items-center">
-          <h2 className="mt-10 text-center text-3xl font-bold tracking-tight text-gray-900">Create your account</h2>
+          <h2 className="mt-10 text-center text-3xl font-bold tracking-tight text-[var(--foreground)]">Create Your Account</h2>
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
           <form onSubmit={handleSubmit(handleSignUp)} className="space-y-6">
 
           <div>
-              <div className="mt-2 flex flex-col gap-3">
-                <Label htmlFor="">Name</Label>
+            <div className="flex items-center justify-between">
+            <Label htmlFor="">Name</Label>
+            </div>
+              <div className="mt-2">
                 <Input type="name" id="name" placeholder="" {...register("name")} />
-                {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
+                {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
               </div>
             </div>
             <div>
-              <div className="mt-2 flex flex-col gap-3">
-                <Label htmlFor="email">Email address</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="email">Email</Label>
+              </div>
+              <div className="mt-2">
                 <Input type="email" id="email" placeholder="" {...register("email")} />
-                {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
+                {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
               </div>
             </div>
 
@@ -120,7 +134,7 @@ export default function SignUp() {
               </div>
               <div className="mt-2">
                 <Input type="password" id="password" placeholder="" {...register("password")} />
-                {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
+                {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
               </div>
             </div>
 
@@ -128,7 +142,7 @@ export default function SignUp() {
               <button
                 type="submit"
                 disabled={loading}
-                className={`flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold text-white shadow-xs transition cursor-pointer duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ${
+                className={`flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-medium text-white shadow-xs transition cursor-pointer duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 h-9 items-center ${
                   loading ? "bg-gray-400 cursor-not-allowed" : "bg-primary-light hover:bg-primary-hover-light"
                 }`}
               >
@@ -143,7 +157,7 @@ export default function SignUp() {
                 <Separator className="w-full" />
               </div>
               <div className="relative flex justify-center text-xs">
-                <span className="bg-white px-2 text-gray-500">Or with</span>
+                <span className="bg-[var(--color-background-separator)] px-2 text-gray-500">Or with</span>
               </div>
             </div>
 
