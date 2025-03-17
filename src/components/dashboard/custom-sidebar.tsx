@@ -3,6 +3,12 @@
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { supabase } from "@/lib/supabase/supabaseClient"
+import { useRouter } from "next/navigation"
+import { useTheme } from "next-themes"
+import { Moon, Sun } from "lucide-react"
+
+
 
 import {
   Sidebar,
@@ -21,8 +27,12 @@ import {
   Target,
   LineChart,
   Bot,
+  Settings,
 } from "lucide-react"
 import { useMountedTheme } from "@/hooks/use-mounted-theme"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu"
+import { Button } from "../ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 
 const menuItems = [
   { title: "Dashboard", icon: Home, href: "/" },
@@ -34,6 +44,13 @@ const menuItems = [
 ]
 
 export function CustomSidebar() {
+  const router = useRouter()
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    router.push("/sign-in")
+  }
+
   const pathname = usePathname()
   const { theme, setTheme, mounted } = useMountedTheme()
 
@@ -73,11 +90,38 @@ export function CustomSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="border-t border-border/40 pt-1">
-        <div className="flex items-center gap-2 px-4 py-2 text-sm">
-          <div className="w-6 h-6 rounded-full bg-muted" />
-          <span className="text-muted-foreground">John Doe</span>
-        </div>
-      </SidebarFooter>
+            <div className="px-2 py-1">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="w-full justify-start gap-1 px-2 h-8 text-xs">
+                    <Avatar className="h-7 w-7">
+                      <AvatarImage src="/placeholder.svg?height=34&width=34" alt="User" />
+                      <AvatarFallback>JD</AvatarFallback>
+                    </Avatar>
+                    <span className="text-xs ml-2 font-medium">John Doe</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuLabel className="text-xs">My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => router.push("/settings")}>
+                    <Settings className="mr-2 h-3 w-3" />
+                    <span className="text-xs">Settings</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                    className="flex items-center gap-2">
+                    {theme === "dark" ? <Sun className="mr-2 h-3 w-3" /> : <Moon className="mr-2 h-3 w-3" />}
+                    <span className="text-xs">{theme === "dark" ? "Light" : "Dark"} Theme</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <span className="text-xs">Logout</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </SidebarFooter>
     </Sidebar>
   )
 }

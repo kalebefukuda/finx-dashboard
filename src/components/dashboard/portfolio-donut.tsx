@@ -42,7 +42,7 @@ export function PortfolioDonutChart() {
   return (
     <Card className="w-full h-full">
       <CardHeader>
-        <CardTitle>Ativos na carteira</CardTitle>
+        <CardTitle className="text-sm font-medium text-muted-foreground">Ativos na carteira</CardTitle>
       </CardHeader>
       <CardContent className="h-[300px]">
         <ChartContainer config={chartConfig}>
