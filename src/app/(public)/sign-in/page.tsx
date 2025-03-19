@@ -9,9 +9,9 @@ import { Separator } from "@/components/ui/separator"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { supabase } from "@/lib/supabase/supabaseClient"
 import { Toaster, toast } from "sonner"
 import { useMountedTheme } from "@/hooks/use-mounted-theme"
+import { signIn } from "next-auth/react";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email"),
@@ -34,42 +34,36 @@ export default function SignIn() {
   const { theme, setTheme, mounted } = useMountedTheme()
 
   const handleLogin = async (data: LoginFormValues) => {
-    setLoading(true)
-
-    const { email, password } = data
-    const { data: authData, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
-
-    if (error) {
-      toast.error("Invalid email or password. Try again")
-    } else if (authData?.user) {
-      toast.success("Login successful")
-
+    setLoading(true);
+  
+    const res = await signIn("credentials", {
+      email: data.email,
+      password: data.password,
+      redirect: false,
+    });
+  
+    if (res?.error) {
+      toast.error("Invalid email or password. Try again.");
+    } else {
+      toast.success("Login successful!");
       setTimeout(() => {
-        window.location.href = "/dashboard"
-      }, 1000)
+        window.location.href = "/dashboard";
+      }, 500);
     }
-    setLoading(false)
-  }
+  
+    setLoading(false);
+  };
 
   const handleGoogleLogin = async () => {
-    setGoogleLoading(true)
-
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    })
-
-    if (error) {
-      toast.error("Failed to sign in with Google. Please try again.")
-      setGoogleLoading(false)
+    setGoogleLoading(true);
+    try {
+      await signIn("google", { callbackUrl: "/dashboard" });
+    } catch (error) {
+      toast.error("Failed to sign in with Google. Please try again.");
+    } finally {
+      setGoogleLoading(false);
     }
-  }
-
+  };
 
   return (
     <div className="flex flex-col px-10 py-4">

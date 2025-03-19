@@ -9,9 +9,9 @@ import { Separator } from "@/components/ui/separator"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { supabase } from "@/lib/supabase/supabaseClient"
 import { Toaster, toast } from "sonner"
 import { useMountedTheme } from "@/hooks/use-mounted-theme"
+import { signIn } from "next-auth/react";
 
 const loginSchema = z.object({
     name: z
@@ -38,57 +38,49 @@ export default function SignUp() {
   const { theme, setTheme, mounted } = useMountedTheme()
 
   const handleSignUp = async (data: LoginFormValues) => {
-    setLoading(true)
-
-    const { name, email, password } = data
-    const { data: authData, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          name,
+    setLoading(true);
+  
+    const { name, email, password } = data;
+  
+    try {
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      },
-    })
-
-    if (error) {
-        if (error.message.includes("User already registered")) {
-            toast.error("Email already in use.")
-          } else if (error.message.includes("Password should be")) {
-            toast.error("Password must be at least 6 characters.")
-          } else {
-            toast.error("Unable to create account. Try again.")
-          }
-    } else if (authData?.user) {
-      toast.success("Account created")
-
-      setTimeout(() => {
-        window.location.href = "/dashboard"
-      }, 1000)
+        body: JSON.stringify({ name, email, password }),
+      });
+  
+      if (response.ok) {
+        toast.success("Account created");
+        setTimeout(() => {
+          window.location.href = "/sign-in";
+        }, 500);
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.error || "Unable to create account. Try again.");
+      }
+    } catch (error) {
+      toast.error("An error occurred. Please try again.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false)
-  }
+  };
 
   const handleGoogleLogin = async () => {
-    setGoogleLoading(true)
+    setGoogleLoading(true);
 
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    })
-
-    if (error) {
-      toast.error("Failed to sign in with Google. Please try again.")
-      setGoogleLoading(false)
+    try {
+        await signIn("google", { callbackUrl: "http://localhost:3000/dashboard" });
+    } catch (error) {
+        toast.error("Failed to sign in with Google. Please try again.");
+    } finally {
+        setGoogleLoading(false);
     }
-  }
-
+};
 
   return (
     <div className="flex flex-col px-10 py-4">
-
       <div className="flex px-2 mt-2">
         <Link href="/">
           {mounted && (
