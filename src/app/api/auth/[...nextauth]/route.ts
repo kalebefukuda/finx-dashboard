@@ -2,7 +2,7 @@ import NextAuth, { AuthOptions, DefaultSession } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import prisma from "@/lib/prisma/prisma";
+import {prisma} from "@/lib/prisma/prisma";
 import bcrypt from "bcryptjs";
 
 declare module "next-auth" {
@@ -31,7 +31,7 @@ export const authOptions: AuthOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       authorization: {
         params: {
-          prompt: "consent",
+          prompt: "none",
           access_type: "offline",
           response_type: "code",
         },
