@@ -1,5 +1,3 @@
-"use client"
-
 import type React from "react"
 import { useState, useEffect } from "react"
 import { CalendarIcon, Check, ChevronsUpDown } from "lucide-react"

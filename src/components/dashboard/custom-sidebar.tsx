@@ -1,14 +1,11 @@
 'use client'
-
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { supabase } from "@/lib/supabase/supabaseClient"
 import { useRouter } from "next/navigation"
 import { useTheme } from "next-themes"
 import { Moon, Sun } from "lucide-react"
-
-
+import { signOut } from "next-auth/react"
 
 import {
   Sidebar,
@@ -29,10 +26,12 @@ import {
   Bot,
   Settings,
 } from "lucide-react"
+
 import { useMountedTheme } from "@/hooks/use-mounted-theme"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu"
 import { Button } from "../ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
+import { useUser } from "@/contexts/userContext"
 
 const menuItems = [
   { title: "Dashboard", icon: Home, href: "/" },
@@ -45,10 +44,10 @@ const menuItems = [
 
 export function CustomSidebar() {
   const router = useRouter()
+  const { user, loading } = useUser()
 
   const handleLogout = async () => {
-    await supabase.auth.signOut()
-    router.push("/sign-in")
+    await signOut({ callbackUrl: "/sign-in" })
   }
 
   const pathname = usePathname()
@@ -98,7 +97,7 @@ export function CustomSidebar() {
                       <AvatarImage src="/placeholder.svg?height=34&width=34" alt="User" />
                       <AvatarFallback>JD</AvatarFallback>
                     </Avatar>
-                    <span className="text-xs ml-2 font-medium">John Doe</span>
+                    <span className="text-xs ml-2 font-medium">{user?.name}</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">

@@ -1,8 +1,11 @@
+'use client'
 import { SidebarProvider } from "@/components/ui/sidebar"
 import { CustomSidebar } from "@/components/dashboard/custom-sidebar"
+import { UserProvider } from "@/contexts/userContext"
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
+    <UserProvider>
     <SidebarProvider>
       <div className="flex h-screen overflow-hidden">
         <CustomSidebar />
@@ -11,5 +14,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       </div>
     </SidebarProvider>
+    </UserProvider>
   )
 }
