@@ -95,7 +95,7 @@ export function CustomSidebar() {
                   <Button variant="ghost" className="w-full justify-start gap-1 px-2 h-8 text-xs">
                     <Avatar className="h-7 w-7">
                       <AvatarImage src="/placeholder.svg?height=34&width=34" alt="User" />
-                      <AvatarFallback>JD</AvatarFallback>
+                      <AvatarFallback>{user?.image}</AvatarFallback>
                     </Avatar>
                     <span className="text-xs ml-2 font-medium">{user?.name}</span>
                   </Button>
