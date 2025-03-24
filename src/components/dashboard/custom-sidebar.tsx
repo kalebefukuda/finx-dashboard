@@ -4,7 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useRouter } from "next/navigation"
 import { useTheme } from "next-themes"
-import { Moon, Sun } from "lucide-react"
+import { Moon, Sun, Tag } from "lucide-react"
 import { signOut } from "next-auth/react"
 
 import {
@@ -34,12 +34,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { useUser } from "@/contexts/userContext"
 
 const menuItems = [
-  { title: "Dashboard", icon: Home, href: "/" },
+  { title: "Dashboard", icon: Home, href: "/dashboard" },
   { title: "Lançamentos", icon: ListOrdered, href: "/movements" },
   { title: "Gráficos", icon: BarChart3, href: "/graficos" },
   { title: "Metas", icon: Target, href: "/goals" },
   { title: "Investimentos", icon: LineChart, href: "/investments" },
   { title: "Análise", icon: Bot, href: "/ai-review" },
+  {title: "Categorias", icon: Tag,href: "/categories",},
 ]
 
 export function CustomSidebar() {
