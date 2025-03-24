@@ -1,5 +1,4 @@
 'use client'
-
 import { AssetsList } from "@/components/dashboard/assets-list"
 import { MonthlySummary } from "@/components/dashboard/monthly-summary"
 import { HighlightCards } from "@/components/dashboard/highlight-cards"
@@ -10,15 +9,17 @@ import { CustomSidebar } from "@/components/dashboard/custom-sidebar"
 import { AssetsChart } from "@/components/dashboard/assets-chart"
 import { PortfolioDonutChart } from "@/components/dashboard/portfolio-donut"
 import { TransactionModal } from "@/components/dashboard/transaction-modal"
+import { useUser } from "@/contexts/userContext"
 
 export default function Dashboard() {
+  const { user, loading } = useUser()
   return (
     <SidebarProvider>
       <div className="flex h-screen overflow-hidden">
         <div className="flex flex-col flex-1 overflow-auto bg-background w-screen">
           <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="container flex h-14 items-center justify-between px-4 md:px-6">
-              <h1 className="text-xl font-semibold"> Olá John Doe!</h1>
+              <h1 className="text-xl font-semibold"> Olá {user?.name}!</h1>
               <div className="flex items-center gap-2">
                 <TransactionModal>
                   <Button className="flex items-center gap-2 cursor-pointer">
