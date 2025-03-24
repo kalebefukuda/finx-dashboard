@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -42,39 +42,8 @@ interface Category {
   isDefault?: boolean
 }
 
-// Dados iniciais de exemplo
-const initialCategories: Category[] = [
-  // Receitas
-  { id: "1", name: "Salário", type: "income", isDefault: true },
-  { id: "2", name: "Rendimentos de Investimentos", type: "income", isDefault: true },
-  { id: "3", name: "Freelance", type: "income", isDefault: true },
-  { id: "4", name: "Aluguel", type: "income", isDefault: false },
-  { id: "5", name: "Bônus", type: "income", isDefault: false },
-  { id: "6", name: "Presente", type: "income", isDefault: false },
-  { id: "7", name: "Outros", type: "income", isDefault: true },
-
-  // Despesas
-  { id: "8", name: "Moradia", type: "expense", isDefault: true },
-  { id: "9", name: "Alimentação", type: "expense", isDefault: true },
-  { id: "10", name: "Transporte", type: "expense", isDefault: true },
-  { id: "11", name: "Lazer", type: "expense", isDefault: true },
-  { id: "12", name: "Saúde", type: "expense", isDefault: true },
-  { id: "13", name: "Educação", type: "expense", isDefault: true },
-  { id: "14", name: "Vestuário", type: "expense", isDefault: false },
-  { id: "15", name: "Contas (água, luz, etc.)", type: "expense", isDefault: true },
-  { id: "16", name: "Assinaturas", type: "expense", isDefault: false },
-  { id: "17", name: "Outros", type: "expense", isDefault: true },
-
-  // Investimentos
-  { id: "18", name: "Ações", type: "investment", isDefault: true },
-  { id: "19", name: "FIIs", type: "investment", isDefault: true },
-  { id: "20", name: "Renda Fixa", type: "investment", isDefault: true },
-  { id: "21", name: "Criptomoedas", type: "investment", isDefault: true },
-  { id: "22", name: "Investimentos Internacionais", type: "investment", isDefault: false },
-]
-
 export default function CategoriesPage() {
-  const [categories, setCategories] = useState<Category[]>(initialCategories)
+  const [categories, setCategories] = useState<Category[]>([])
   const [activeTab, setActiveTab] = useState<CategoryType>("income")
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
@@ -84,81 +53,73 @@ export default function CategoriesPage() {
   const [deletingCategory, setDeletingCategory] = useState<Category | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
 
-  // Filtrar categorias pelo tipo ativo e pesquisa
+  const loadCategories = async () => {
+    const res = await fetch("/api/categories")
+    const data = await res.json()
+    setCategories(data)
+  }
+
+  useEffect(() => {
+    loadCategories()
+  }, [])
+
   const filteredCategories = categories
-    .filter((category) => category.type === activeTab)
-    .filter((category) => (searchQuery ? category.name.toLowerCase().includes(searchQuery.toLowerCase()) : true))
+    .filter((c) => c.type === activeTab)
+    .filter((c) => c.name.toLowerCase().includes(searchQuery.toLowerCase()))
 
-  // Adicionar nova categoria
-  const handleAddCategory = () => {
-    if (newCategoryName.trim()) {
-      const newCategory: Category = {
-        id: Date.now().toString(),
-        name: newCategoryName.trim(),
-        type: activeTab,
-        isDefault: false,
-      }
-      setCategories([...categories, newCategory])
-      setNewCategoryName("")
-      setIsAddDialogOpen(false)
-    }
+  const handleAddCategory = async () => {
+    if (!newCategoryName.trim()) return
+
+    const res = await fetch("/api/categories", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: newCategoryName.trim(), type: activeTab })
+    })
+
+    const newCat = await res.json()
+    setCategories(prev => [...prev, newCat])
+    setNewCategoryName("")
+    setIsAddDialogOpen(false)
   }
 
-  // Iniciar edição de categoria
-  const startEditCategory = (category: Category) => {
-    setEditingCategory(category)
-    setNewCategoryName(category.name)
-    setIsEditDialogOpen(true)
+  const handleEditCategory = async () => {
+    if (!editingCategory || !newCategoryName.trim()) return
+
+    const res = await fetch(`/api/categories/${editingCategory.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: newCategoryName.trim() })
+    })
+
+    const updated = await res.json()
+    setCategories(prev => prev.map(cat => cat.id === updated.id ? updated : cat))
+    setEditingCategory(null)
+    setIsEditDialogOpen(false)
+    setNewCategoryName("")
   }
 
-  // Salvar edição de categoria
-  const handleEditCategory = () => {
-    if (editingCategory && newCategoryName.trim()) {
-      setCategories(
-        categories.map((cat) => (cat.id === editingCategory.id ? { ...cat, name: newCategoryName.trim() } : cat)),
-      )
-      setNewCategoryName("")
-      setEditingCategory(null)
-      setIsEditDialogOpen(false)
-    }
+  const handleDeleteCategory = async () => {
+    if (!deletingCategory) return
+
+    await fetch(`/api/categories/${deletingCategory.id}`, { method: "DELETE" })
+    setCategories(prev => prev.filter(cat => cat.id !== deletingCategory.id))
+    setDeletingCategory(null)
+    setIsDeleteDialogOpen(false)
   }
 
-  // Iniciar exclusão de categoria
-  const startDeleteCategory = (category: Category) => {
-    setDeletingCategory(category)
-    setIsDeleteDialogOpen(true)
-  }
-
-  // Confirmar exclusão de categoria
-  const handleDeleteCategory = () => {
-    if (deletingCategory) {
-      setCategories(categories.filter((cat) => cat.id !== deletingCategory.id))
-      setDeletingCategory(null)
-      setIsDeleteDialogOpen(false)
-    }
-  }
-
-  // Obter ícone baseado no tipo de categoria
   const getCategoryIcon = (type: CategoryType) => {
     switch (type) {
-      case "income":
-        return <ArrowUp className="h-4 w-4 text-emerald-500" />
-      case "expense":
-        return <ArrowDown className="h-4 w-4 text-rose-500" />
-      case "investment":
-        return <LineChart className="h-4 w-4 text-blue-500" />
+      case "income": return <ArrowUp className="h-4 w-4 text-emerald-500" />
+      case "expense": return <ArrowDown className="h-4 w-4 text-rose-500" />
+      case "investment": return <LineChart className="h-4 w-4 text-blue-500" />
     }
   }
 
-  // Obter cor baseada no tipo de categoria
   const getCategoryColor = (type: CategoryType) => {
     switch (type) {
-      case "income":
-        return "bg-emerald-100 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400"
-      case "expense":
-        return "bg-rose-100 dark:bg-rose-950/30 text-rose-700 dark:text-rose-400"
-      case "investment":
-        return "bg-blue-100 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400"
+      case "income": return "bg-emerald-100 dark:bg-emerald-950/30"
+      case "expense": return "bg-rose-100 dark:bg-rose-950/30"
+      case "investment": return "bg-blue-100 dark:bg-blue-950/30"
     }
   }
 
@@ -285,11 +246,6 @@ export default function CategoriesPage() {
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
-                            {category.isDefault ? (
-                              <Badge variant="secondary" className="text-xs">Padrão</Badge>
-                            ) : (
-                              <Badge variant="outline" className="text-xs">Personalizada</Badge>
-                            )}
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
                                 <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -298,13 +254,19 @@ export default function CategoriesPage() {
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => startEditCategory(category)}>
+                                <DropdownMenuItem onClick={() => {
+                                  setEditingCategory(category)
+                                  setNewCategoryName(category.name)
+                                  setIsEditDialogOpen(true)
+                                }}>
                                   <Edit className="mr-2 h-4 w-4" />
                                   <span>Editar</span>
                                 </DropdownMenuItem>
                                 {!category.isDefault && (
                                   <DropdownMenuItem
-                                    onClick={() => startDeleteCategory(category)}
+                                    onClick={() => {
+                                      setDeletingCategory(category)
+                                      setIsDeleteDialogOpen(true)}}
                                     className="text-destructive focus:text-destructive"
                                   >
                                     <Trash2 className="mr-2 h-4 w-4" />

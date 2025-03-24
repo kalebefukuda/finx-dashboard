@@ -20,6 +20,8 @@ model User {
   sessions       Session[]
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
+  categories Category[]
+
 }
 
 model Account {
@@ -47,3 +49,22 @@ model Session {
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id])
 }
+
+model Category {
+  id         String   @id @default(cuid())
+  name       String
+  type       CategoryType
+  isDefault  Boolean     @default(false)
+  userId     String?    
+  user       User?       @relation(fields: [userId], references: [id])
+
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}
+
+enum CategoryType {
+  income
+  expense
+  investment
+}
+
