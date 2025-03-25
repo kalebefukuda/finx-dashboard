@@ -35,7 +35,7 @@ import { useUser } from "@/contexts/userContext"
 
 const menuItems = [
   { title: "Dashboard", icon: Home, href: "/dashboard" },
-  { title: "Lançamentos", icon: ListOrdered, href: "/movements" },
+  { title: "Lançamentos", icon: ListOrdered, href: "/transactions" },
   { title: "Gráficos", icon: BarChart3, href: "/graficos" },
   { title: "Metas", icon: Target, href: "/goals" },
   { title: "Investimentos", icon: LineChart, href: "/investments" },
@@ -45,8 +45,7 @@ const menuItems = [
 
 export function CustomSidebar() {
   const router = useRouter()
-  const { user, loading } = useUser()
-
+  const { user, loading } = useUser()  
   const handleLogout = async () => {
     await signOut({ callbackUrl: "/sign-in" })
   }
