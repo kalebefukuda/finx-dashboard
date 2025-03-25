@@ -16,16 +16,6 @@
 ### **Database:**
 - **Supabase** – Cloud-hosted PostgreSQL database
 
-## ⚡ Why use Next.js API Routes instead of Fastify?
-**Next.js** comes with built-in support for **API Routes**, allowing you to create a backend directly within the project without setting up an external server. Since **FinX** is a personal finance dashboard where the API serves only the Next.js frontend, API Routes are a simple and efficient solution.
-
-### ✅ **Advantages of using Next.js API Routes:**
-- 🚀 **Simpler setup** → All-in-one project, no need for a separate backend.
-- 🛠️ **Easy deployment** → Great compatibility with Vercel.
-- 🔄 **Less maintenance** → No need to manage an additional server.
-
-If greater performance or scalability is needed in the future, we can consider migrating to a dedicated server with **Fastify**.
-
 ## 🔧 Project Setup
 ### **1️⃣ Install dependencies**
 ```sh
@@ -37,17 +27,15 @@ Create a  `.env.local` file and add your Supabase credentials:
 NEXT_PUBLIC_SUPABASE_URL="https://seu-supabase-url.supabase.co"
 NEXT_PUBLIC_SUPABASE_ANON_KEY="sua-anon-key-aqui"
 DATABASE_URL="postgresql://seu-usuario:senha@host:porta/seu-banco"
+NEXTAUTH_URL=url-your-project
+NEXTAUTH_SECRET="your-next-auth-key"
+DIRECT_URL="postgresql://postgres.seu-supabase-url:[your-pass]@aws-0-sa-east-1.pooler.supabase.com:porta/postgres"
+NEXT_PUBLIC_GOOGLE_CLIENT_ID="your-public-client-id"
+GOOGLE_CLIENT_SECRET="your-google-client-secret"
 ```
 ### **3️⃣ Run the development server**
 ```sh
 npm run dev
 ```
 
-## 📌  Next Steps
-- Implement authentication system with Supabase
-- Add interactive financial charts
-- Integrate external APIs for automatic data import
-
----
-✉️ Have any questions? Feel free to reach out! 🚀
 
