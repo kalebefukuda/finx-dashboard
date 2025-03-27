@@ -16,7 +16,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import {
   ArrowDown,
@@ -52,11 +51,19 @@ export default function CategoriesPage() {
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
   const [deletingCategory, setDeletingCategory] = useState<Category | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
+  const [isLoading, setIsLoading] = useState(true)
 
   const loadCategories = async () => {
-    const res = await fetch("/api/categories")
-    const data = await res.json()
-    setCategories(data)
+    setIsLoading(true)
+    try {
+      const res = await fetch("/api/categories")
+      const data = await res.json()
+      setCategories(data)
+    } catch (error) {
+      console.error("Erro ao carregar categorias:", error)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   useEffect(() => {
@@ -70,62 +77,80 @@ export default function CategoriesPage() {
   const handleAddCategory = async () => {
     if (!newCategoryName.trim()) return
 
-    const res = await fetch("/api/categories", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: newCategoryName.trim(), type: activeTab })
-    })
+    try {
+      const res = await fetch("/api/categories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: newCategoryName.trim(), type: activeTab }),
+      })
 
-    const newCat = await res.json()
-    setCategories(prev => [...prev, newCat])
-    setNewCategoryName("")
-    setIsAddDialogOpen(false)
+      const newCat = await res.json()
+      setCategories((prev) => [...prev, newCat])
+      setNewCategoryName("")
+      setIsAddDialogOpen(false)
+    } catch (error) {
+      console.error("Erro ao adicionar categoria:", error)
+    }
   }
 
   const handleEditCategory = async () => {
     if (!editingCategory || !newCategoryName.trim()) return
 
-    const res = await fetch(`/api/categories/${editingCategory.id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: newCategoryName.trim() })
-    })
+    try {
+      const res = await fetch(`/api/categories/${editingCategory.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: newCategoryName.trim() }),
+      })
 
-    const updated = await res.json()
-    setCategories(prev => prev.map(cat => cat.id === updated.id ? updated : cat))
-    setEditingCategory(null)
-    setIsEditDialogOpen(false)
-    setNewCategoryName("")
+      const updated = await res.json()
+      setCategories((prev) => prev.map((cat) => (cat.id === updated.id ? updated : cat)))
+      setEditingCategory(null)
+      setIsEditDialogOpen(false)
+      setNewCategoryName("")
+    } catch (error) {
+      console.error("Erro ao editar categoria:", error)
+    }
   }
 
   const handleDeleteCategory = async () => {
     if (!deletingCategory) return
 
-    await fetch(`/api/categories/${deletingCategory.id}`, { method: "DELETE" })
-    setCategories(prev => prev.filter(cat => cat.id !== deletingCategory.id))
-    setDeletingCategory(null)
-    setIsDeleteDialogOpen(false)
+    try {
+      await fetch(`/api/categories/${deletingCategory.id}`, { method: "DELETE" })
+      setCategories((prev) => prev.filter((cat) => cat.id !== deletingCategory.id))
+      setDeletingCategory(null)
+      setIsDeleteDialogOpen(false)
+    } catch (error) {
+      console.error("Erro ao excluir categoria:", error)
+    }
   }
 
   const getCategoryIcon = (type: CategoryType) => {
     switch (type) {
-      case "income": return <ArrowUp className="h-4 w-4 text-emerald-500" />
-      case "expense": return <ArrowDown className="h-4 w-4 text-rose-500" />
-      case "investment": return <LineChart className="h-4 w-4 text-blue-500" />
+      case "income":
+        return <ArrowUp className="h-4 w-4 text-emerald-500" />
+      case "expense":
+        return <ArrowDown className="h-4 w-4 text-rose-500" />
+      case "investment":
+        return <LineChart className="h-4 w-4 text-blue-500" />
     }
   }
 
   const getCategoryColor = (type: CategoryType) => {
     switch (type) {
-      case "income": return "bg-emerald-100 dark:bg-emerald-950/30"
-      case "expense": return "bg-rose-100 dark:bg-rose-950/30"
-      case "investment": return "bg-blue-100 dark:bg-blue-950/30"
+      case "income":
+        return "bg-emerald-100 dark:bg-emerald-950/30"
+      case "expense":
+        return "bg-rose-100 dark:bg-rose-950/30"
+      case "investment":
+        return "bg-blue-100 dark:bg-blue-950/30"
     }
   }
 
   return (
     <div className="flex flex-col h-screen overflow-auto bg-background">
-      <header className="w-screen border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-14 items-center justify-between px-4 md:px-6">
           <h1 className="text-xl font-semibold">Gerenciamento de Categorias</h1>
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
@@ -212,78 +237,104 @@ export default function CategoriesPage() {
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-[calc(100vh-300px)] pr-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {filteredCategories.length === 0 ? (
-                    <div className="col-span-full flex flex-col items-center justify-center py-8 text-center">
-                      <CircleDollarSign className="h-12 w-12 text-muted-foreground/50 mb-4" />
-                      <h3 className="text-lg font-medium">Nenhuma categoria encontrada</h3>
-                      <p className="text-muted-foreground mt-1">
-                        {searchQuery ? "Tente ajustar sua pesquisa ou" : "Comece"} adicionando uma nova categoria.
-                      </p>
-                      <Button onClick={() => setIsAddDialogOpen(true)} className="mt-4" variant="outline">
-                        <Plus className="mr-2 h-4 w-4" />
-                        Adicionar Categoria
-                      </Button>
-                    </div>
-                  ) : (
-                    filteredCategories.map((category) => (
-                      <Card
-                      key={category.id}
-                      className="overflow-hidden relative pt-6 min-h-[130px] max-h-[150px] w-full"
-                    >
-                      <div
-                        className={`absolute top-0 left-0 w-full h-6 ${getCategoryColor(category.type)} rounded-t-md`}
-                      />
-                    
-                      <CardContent className="px-8 py-5 z-10 mt-3">
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="flex items-center gap-3 w-[220px]">
-                            <div>
-                            {getCategoryIcon(category.type)}
+                {isLoading ? (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {Array.from({ length: 6 }).map((_, index) => (
+                      <div key={index} className="relative overflow-hidden">
+                        <div className="animate-pulse flex flex-col">
+                          <div
+                            className={`h-6 w-full rounded-t-md ${
+                              activeTab === "income"
+                                ? "bg-emerald-100 dark:bg-emerald-950/30"
+                                : activeTab === "expense"
+                                  ? "bg-rose-100 dark:bg-rose-950/30"
+                                  : "bg-blue-100 dark:bg-blue-950/30"
+                            }`}
+                          ></div>
+                          <div className="bg-card border rounded-b-md h-[120px] flex items-center justify-between p-6">
+                            <div className="flex items-center gap-3">
+                              <div className="h-4 w-4 rounded-full bg-muted"></div>
+                              <div className="h-5 w-32 bg-muted rounded"></div>
                             </div>
-                            <span className="font-medium break-words line-clamp-2 text-sm leading-tight">
-                              {category.name}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon" className="h-8 w-8">
-                                  <MoreHorizontal className="h-4 w-4" />
-                                  <span className="sr-only">Ações</span>
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => {
-                                  setEditingCategory(category)
-                                  setNewCategoryName(category.name)
-                                  setIsEditDialogOpen(true)
-                                }}>
-                                  <Edit className="mr-2 h-4 w-4" />
-                                  <span>Editar</span>
-                                </DropdownMenuItem>
-                                {!category.isDefault && (
-                                  <DropdownMenuItem
-                                    onClick={() => {
-                                      setDeletingCategory(category)
-                                      setIsDeleteDialogOpen(true)}}
-                                    className="text-destructive focus:text-destructive"
-                                  >
-                                    <Trash2 className="mr-2 h-4 w-4" />
-                                    <span>Excluir</span>
-                                  </DropdownMenuItem>
-                                )}
-                              </DropdownMenuContent>
-                            </DropdownMenu>
+                            <div className="h-8 w-8 bg-muted rounded-md"></div>
                           </div>
                         </div>
-                      </CardContent>
-                    </Card>
-                    
+                        {/* Efeito de brilho animado */}
+                        <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+                      </div>
+                    ))}
+                  </div>
+                ) : filteredCategories.length === 0 ? (
+                  <div className="col-span-full flex flex-col items-center justify-center py-8 text-center">
+                    <CircleDollarSign className="h-12 w-12 text-muted-foreground/50 mb-4" />
+                    <h3 className="text-lg font-medium">Nenhuma categoria encontrada</h3>
+                    <p className="text-muted-foreground mt-1">
+                      {searchQuery ? "Tente ajustar sua pesquisa ou" : "Comece"} adicionando uma nova categoria.
+                    </p>
+                    <Button onClick={() => setIsAddDialogOpen(true)} className="mt-4" variant="outline">
+                      <Plus className="mr-2 h-4 w-4" />
+                      Adicionar Categoria
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {filteredCategories.map((category) => (
+                      <Card
+                        key={category.id}
+                        className="overflow-hidden relative pt-6 min-h-[130px] max-h-[150px] w-full"
+                      >
+                        <div
+                          className={`absolute top-0 left-0 w-full h-6 ${getCategoryColor(category.type)} rounded-t-md`}
+                        />
 
-                    ))
-                  )}
-                </div>
+                        <CardContent className="px-8 py-5 z-10 mt-3">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-3 w-[220px]">
+                              <div>{getCategoryIcon(category.type)}</div>
+                              <span className="font-medium break-words line-clamp-2 text-sm leading-tight">
+                                {category.name}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                    <span className="sr-only">Ações</span>
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem
+                                    onClick={() => {
+                                      setEditingCategory(category)
+                                      setNewCategoryName(category.name)
+                                      setIsEditDialogOpen(true)
+                                    }}
+                                  >
+                                    <Edit className="mr-2 h-4 w-4" />
+                                    <span>Editar</span>
+                                  </DropdownMenuItem>
+                                  {!category.isDefault && (
+                                    <DropdownMenuItem
+                                      onClick={() => {
+                                        setDeletingCategory(category)
+                                        setIsDeleteDialogOpen(true)
+                                      }}
+                                      className="text-destructive focus:text-destructive"
+                                    >
+                                      <Trash2 className="mr-2 h-4 w-4" />
+                                      <span>Excluir</span>
+                                    </DropdownMenuItem>
+                                  )}
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
               </ScrollArea>
             </CardContent>
           </Card>
