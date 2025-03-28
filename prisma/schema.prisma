@@ -21,6 +21,7 @@ model User {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   categories Category[]
+  transactions   Transaction[]
 
 }
 
@@ -57,6 +58,7 @@ model Category {
   isDefault  Boolean     @default(false)
   userId     String?    
   user       User?       @relation(fields: [userId], references: [id])
+  transactions Transaction[]
 
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
@@ -66,5 +68,57 @@ enum CategoryType {
   income
   expense
   investment
+}
+
+model Transaction {
+  id          String      @id @default(cuid())
+  type        TransactionType
+  amount      Decimal     @db.Decimal(10, 2)
+  date        DateTime
+  description String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  category    Category?   @relation(fields: [categoryId], references: [id])
+  categoryId  String?
+  paymentMethod PaymentMethod?
+  operationType InvestmentOperationType?
+  assetType    AssetType?
+  asset        String?    
+  quantity     Float?     
+  unitPrice    Float?     
+  notes       String?    
+  user        User        @relation(fields: [userId], references: [id])
+  userId      String
+
+  @@index([userId])
+  @@index([date])
+  @@index([type])
+}
+
+enum TransactionType {
+  FINANCIAL
+  INVESTMENT
+}
+
+enum PaymentMethod {
+  PIX
+  CREDIT_CARD
+  DEBIT_CARD
+  CASH
+  BANK_TRANSFER
+  BOLETO
+}
+
+enum InvestmentOperationType {
+  BUY
+  SELL
+}
+
+enum AssetType {
+  STOCK
+  FII
+  FIXED_INCOME
+  CRYPTO
+  INTERNATIONAL
 }
 

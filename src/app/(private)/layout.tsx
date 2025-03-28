@@ -2,6 +2,7 @@
 import { SidebarProvider } from "@/components/ui/sidebar"
 import { CustomSidebar } from "@/components/dashboard/custom-sidebar"
 import { UserProvider } from "@/contexts/userContext"
+import { Toaster } from "@/components/ui/sonner"
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -13,6 +14,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {children}
         </div>
       </div>
+      <Toaster position="bottom-left" />
     </SidebarProvider>
     </UserProvider>
   )
