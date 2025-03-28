@@ -2,9 +2,10 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { CalendarIcon, Check, ChevronsUpDown } from "lucide-react"
 import { format } from "date-fns"
+import { Toaster, toast } from "sonner"
 import { ptBR } from "date-fns/locale"
 
 import { Button } from "@/components/ui/button"
@@ -26,33 +27,9 @@ import { Calendar } from "@/components/ui/calendar"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
+import { ScrollArea } from "../ui/scroll-area"
 
-// Categorias de receitas
-const incomeCategories = [
-  { value: "salary", label: "Salário" },
-  { value: "investments", label: "Rendimentos de Investimentos" },
-  { value: "freelance", label: "Freelance" },
-  { value: "rental", label: "Aluguel" },
-  { value: "bonus", label: "Bônus" },
-  { value: "gift", label: "Presente" },
-  { value: "other_income", label: "Outros" },
-]
 
-// Categorias de despesas
-const expenseCategories = [
-  { value: "housing", label: "Moradia" },
-  { value: "food", label: "Alimentação" },
-  { value: "transportation", label: "Transporte" },
-  { value: "leisure", label: "Lazer" },
-  { value: "health", label: "Saúde" },
-  { value: "education", label: "Educação" },
-  { value: "clothing", label: "Vestuário" },
-  { value: "utilities", label: "Contas (água, luz, etc.)" },
-  { value: "subscriptions", label: "Assinaturas" },
-  { value: "other_expense", label: "Outros" },
-]
-
-// Métodos de pagamento
 const paymentMethods = [
   { value: "pix", label: "PIX" },
   { value: "credit_card", label: "Cartão de Crédito" },
@@ -62,7 +39,6 @@ const paymentMethods = [
   { value: "boleto", label: "Boleto" },
 ]
 
-// Tipos de ativos
 const assetTypes = [
   { value: "stocks", label: "Ações" },
   { value: "fiis", label: "FIIs" },
@@ -71,7 +47,6 @@ const assetTypes = [
   { value: "international", label: "Investimentos Internacionais" },
 ]
 
-// Ativos por tipo
 const assetsByType = {
   stocks: [
     { value: "PETR4", label: "PETR4 - Petrobras PN" },
@@ -105,116 +80,166 @@ const assetsByType = {
   ],
 }
 
-// Tipos de operação para investimentos
 const investmentOperationTypes = [
   { value: "buy", label: "Compra" },
   { value: "sell", label: "Venda" },
 ]
 
+type Category = {
+  id: string
+  name: string
+  type: "income" | "expense" | "investment"
+  isDefault: boolean
+  userId?: string | null
+}
+
 export function TransactionModal({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false)
   const [activeTab, setActiveTab] = useState("finance")
-
-  // Estados para lançamentos financeiros
   const [transactionType, setTransactionType] = useState("expense")
   const [category, setCategory] = useState("")
   const [openCategoryCombobox, setOpenCategoryCombobox] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState("")
   const [openPaymentMethodCombobox, setOpenPaymentMethodCombobox] = useState(false)
-
-  // Estados para operações de investimentos
   const [operationType, setOperationType] = useState("buy")
   const [assetType, setAssetType] = useState("")
   const [openAssetTypeCombobox, setOpenAssetTypeCombobox] = useState(false)
   const [asset, setAsset] = useState("")
   const [openAssetCombobox, setOpenAssetCombobox] = useState(false)
-
-  // Estados comuns
+  const [amount, setAmount] = useState("")
+  const [quantity, setQuantity] = useState("")
+  const [unitPrice, setUnitPrice] = useState("")
+  const [notes, setNotes] = useState("")
   const [date, setDate] = useState<Date>(new Date())
+  const [categories, setCategories] = useState<Category[]>([])
+
+  useEffect(() => {
+    fetch("/api/categories")
+      .then(res => res.json())
+      .then(setCategories)
+  }, [])
 
   const getAssetsByType = (type: string) => {
     return assetsByType[type as keyof typeof assetsByType] || []
   }
 
-  const getCategoriesByType = (type: string) => {
-    return type === "income" ? incomeCategories : expenseCategories
-  }
-
   const resetForm = () => {
-    // Reset estados de lançamentos financeiros
     setTransactionType("expense")
     setCategory("")
     setPaymentMethod("")
-
-    // Reset estados de operações de investimentos
     setOperationType("buy")
     setAssetType("")
     setAsset("")
-
-    // Reset estados comuns
     setDate(new Date())
-
-    // Reset tab
     setActiveTab("finance")
+    setAmount("")
+    setQuantity("")
+    setUnitPrice("")
+    setNotes("")
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Formulário enviado", {
-      type: activeTab,
-      ...(activeTab === "finance"
-        ? {
-            transactionType,
-            category,
-            paymentMethod,
-            date,
-          }
-        : {
-            operationType,
-            assetType,
-            asset,
-            date,
-          }),
-    })
-    setOpen(false)
-    resetForm()
+
+    const rawAmount = amount.replace(/\D/g, "") // só números
+    const parsedAmount = Number(rawAmount) / 100
+
+    if (isNaN(parsedAmount) || parsedAmount <= 0) {
+      alert("Digite um valor válido para o campo Valor (R$)")
+      return
+    }
+
+    const payload =
+  activeTab === "finance"
+    ? {
+        type: "FINANCIAL",
+        categoryId: category || undefined,
+        paymentMethod: paymentMethod.toUpperCase(),
+        amount: parsedAmount,
+        date,
+      }
+    : {
+        type: "INVESTMENT",
+        operationType: operationType.toUpperCase(),
+        assetType: assetType.toUpperCase(),
+        asset,
+        quantity: parseFloat(quantity),
+        unitPrice: parseFloat(unitPrice),
+        amount: parseFloat(quantity) * parseFloat(unitPrice),
+        date,
+        notes,
+      }
+
+    try {
+      const res = await fetch("/api/transactions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      })
+
+      if (!res.ok) throw new Error("Erro ao salvar transação")
+
+      if (activeTab === "finance") {
+        const tipoTransacao = transactionType === "income" ? "Receita" : "Despesa"
+        toast.success(`${tipoTransacao} registrada com sucesso!`)
+      } else {
+        const tipoOperacao = operationType === "buy" ? "Compra" : "Venda"
+        toast.success(`${tipoOperacao} de investimento registrada com sucesso!`)
+      }
+
+      setOpen(false)
+      resetForm()
+
+    } catch (err) {
+      console.error("Erro:", err)
+      toast.error(err instanceof Error ? err.message : "Erro ao salvar transação")
+    }
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open}  onOpenChange={(isOpen) => {
+        setOpen(isOpen)
+        if (!isOpen) resetForm()
+      }}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-[550px]">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>Adicionar Lançamento</DialogTitle>
-            <DialogDescription>Registre uma nova transação financeira ou operação de investimento.</DialogDescription>
           </DialogHeader>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-4">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="finance">Lançamento Financeiro</TabsTrigger>
-              <TabsTrigger value="investment">Operação de Investimento</TabsTrigger>
+              <TabsTrigger value="finance" className="cursor-pointer">Lançamento Financeiro</TabsTrigger>
+              <TabsTrigger value="investment" className="cursor-pointer">Operação de Investimento</TabsTrigger>
             </TabsList>
 
             {/* Conteúdo para Lançamentos Financeiros */}
+            <div className="h-[420px] overflow-hidden">
+            <ScrollArea className="h-full pr-4">
             <TabsContent value="finance" className="space-y-4 mt-4">
-              <div className="grid gap-2">
-                <Label>Tipo de Lançamento</Label>
-                <RadioGroup value={transactionType} onValueChange={setTransactionType} className="flex gap-4">
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="income" id="income" />
-                    <Label htmlFor="income" className="text-emerald-500 font-medium">
-                      Receita
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="expense" id="expense" />
-                    <Label htmlFor="expense" className="text-rose-500 font-medium">
-                      Despesa
-                    </Label>
-                  </div>
-                </RadioGroup>
+            <div className="grid gap-2">
+              <Label>Tipo de Lançamento</Label>
+              <div className="grid grid-cols-2 gap-2">
+                <Button
+                  type="button"
+                  variant={transactionType === "income" ? "default" : "outline"}
+                  className={transactionType === "income" ? "bg-emerald-500 hover:bg-emerald-600 text-white" : ""}
+                  onClick={() => setTransactionType("income")}
+                >
+                  Receita
+                </Button>
+                <Button
+                  type="button"
+                  variant={transactionType === "expense" ? "default" : "outline"}
+                  className={transactionType === "expense" ? "bg-rose-500 hover:bg-rose-600 text-white" : ""}
+                  onClick={() => setTransactionType("expense")}
+                >
+                  Despesa
+                </Button>
               </div>
+            </div>
+
 
               <div className="grid gap-2">
                 <Label>Categoria</Label>
@@ -227,7 +252,7 @@ export function TransactionModal({ children }: { children: React.ReactNode }) {
                       className="justify-between"
                     >
                       {category
-                        ? getCategoriesByType(transactionType).find((cat) => cat.value === category)?.label
+                        ? categories.find((cat) => cat.id === category)?.name
                         : "Selecione uma categoria"}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
@@ -238,32 +263,49 @@ export function TransactionModal({ children }: { children: React.ReactNode }) {
                       <CommandList>
                         <CommandEmpty>Nenhuma categoria encontrada.</CommandEmpty>
                         <CommandGroup>
-                          {getCategoriesByType(transactionType).map((cat) => (
-                            <CommandItem
-                              key={cat.value}
-                              value={cat.value}
-                              onSelect={(currentValue) => {
-                                setCategory(currentValue === category ? "" : currentValue)
-                                setOpenCategoryCombobox(false)
-                              }}
-                            >
-                              <Check
-                                className={cn("mr-2 h-4 w-4", category === cat.value ? "opacity-100" : "opacity-0")}
-                              />
-                              {cat.label}
-                            </CommandItem>
-                          ))}
+                          {categories
+                            .filter((cat) => cat.type === transactionType)
+                            .map((cat) => (
+                              <CommandItem
+                                key={cat.id}
+                                value={cat.id}
+                                onSelect={(currentValue) => {
+                                  setCategory(currentValue === category ? "" : currentValue)
+                                  setOpenCategoryCombobox(false)
+                                }}
+                              >
+                                <Check
+                                  className={cn("mr-2 h-4 w-4", category === cat.id ? "opacity-100" : "opacity-0")}
+                                />
+                                {cat.name}
+                              </CommandItem>
+                            ))}
                         </CommandGroup>
                       </CommandList>
                     </Command>
                   </PopoverContent>
                 </Popover>
               </div>
-
               <div className="grid gap-2">
                 <Label htmlFor="value">Valor (R$)</Label>
-                <Input id="value" type="number" step="0.01" min="0" placeholder="0,00" required />
-              </div>
+                <Input
+                  id="value"
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="0,00"
+                  value={amount}
+                  onChange={(e) => {
+                    const raw = e.target.value.replace(/\D/g, "") // remove tudo que não for número
+                    const numeric = parseFloat(raw) / 100
+                    const formatted = numeric.toLocaleString("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    })
+                    setAmount(formatted)
+                  }}
+                  required
+                />             
+               </div>
 
               <div className="grid gap-2">
                 <Label>Método de Pagamento</Label>
@@ -335,35 +377,31 @@ export function TransactionModal({ children }: { children: React.ReactNode }) {
                   </PopoverContent>
                 </Popover>
               </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="description">Descrição</Label>
-                <Textarea
-                  id="description"
-                  placeholder="Adicione detalhes sobre este lançamento"
-                  className="resize-none"
-                />
-              </div>
             </TabsContent>
 
             {/* Conteúdo para Operações de Investimento */}
             <TabsContent value="investment" className="space-y-4 mt-4">
-              <div className="grid gap-2">
-                <Label>Tipo de Operação</Label>
-                <RadioGroup value={operationType} onValueChange={setOperationType} className="flex gap-4">
-                  {investmentOperationTypes.map((type) => (
-                    <div key={type.value} className="flex items-center space-x-2">
-                      <RadioGroupItem value={type.value} id={type.value} />
-                      <Label
-                        htmlFor={type.value}
-                        className={cn(type.value === "buy" ? "text-emerald-500" : "text-rose-500", "font-medium")}
-                      >
-                        {type.label}
-                      </Label>
-                    </div>
-                  ))}
-                </RadioGroup>
+            <div className="grid gap-2">
+              <Label>Tipo de Operação</Label>
+              <div className="grid grid-cols-2 gap-2">
+                <Button
+                  type="button"
+                  variant={operationType === "buy" ? "default" : "outline"}
+                  className={operationType === "buy" ? "bg-emerald-500 hover:bg-emerald-600 text-white" : ""}
+                  onClick={() => setOperationType("buy")}
+                >
+                  Compra
+                </Button>
+                <Button
+                  type="button"
+                  variant={operationType === "sell" ? "default" : "outline"}
+                  className={operationType === "sell" ? "bg-rose-500 hover:bg-rose-600 text-white" : ""}
+                  onClick={() => setOperationType("sell")}
+                >
+                  Venda
+                </Button>
               </div>
+            </div>
 
               <div className="grid gap-2">
                 <Label>Tipo de Ativo</Label>
@@ -486,12 +524,9 @@ export function TransactionModal({ children }: { children: React.ReactNode }) {
                   </PopoverContent>
                 </Popover>
               </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="notes">Observações</Label>
-                <Textarea id="notes" placeholder="Adicione notas sobre esta operação" className="resize-none" />
-              </div>
             </TabsContent>
+            </ScrollArea>
+            </div>
           </Tabs>
 
           <DialogFooter className="mt-6">

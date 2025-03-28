@@ -45,6 +45,7 @@ O **FinX** surge como resposta à crescente demanda por ferramentas digitais ace
 - **RF07:** O sistema deve permitir o cadastro de ativos financeiros.
 - **RF08:** O sistema deve salvar automaticamente os dados no banco de dados.
 - **RF09:** O sistema deve permitir o logout seguro do usuário.
+- **RF10:** O sistema deve permitir o usuário criar categorias pessoas de investimento e renda.
 
 ### 2.2 Requisitos Não Funcionais ❓
 
@@ -92,8 +93,6 @@ O sistema **FinX** segue uma **arquitetura monolítica**, onde tanto o **front-e
 - **Back-end integrado ao Next.js:** O **Next.js** gerencia tanto as rotas de front-end quanto as rotas de API (através das **API Routes**).
   
 (Usando estrutura da documentação do [Next.js](https://nextjs.org))
-
-Essa abordagem monolítica é adequada para a fase inicial do **FinX**, pois proporciona uma integração mais simples e rápida entre os componentes da aplicação. 
 
 ### 2.5 Planejamento da Infraestrutura
 - **Banco de Dados:** **Supabase** (utilizando PostgreSQL como banco de dados relacional).
@@ -160,14 +159,14 @@ O planejamento de testes para o **FinX** será realizado para garantir que todas
 #### 3.3.3 Testes de Segurança
 
 - ✅ **Objetivo:** Garantir que o sistema esteja protegido contra falhas de segurança.
-- ✅ **Como será feito:** Utilizando ferramentas como **OWASP ZAP** para identificar vulnerabilidades e realizar testes de **injeção SQL** e **XSS**.
-- ✅ **Medição:** O número de vulnerabilidades críticas deve ser **zero** antes do lançamento.
+- ✅ **Como será feito:** Utilizando ferramentas como **OWASP ZAP** (exemplo) para identificar vulnerabilidades e realizar testes de **injeção SQL** e **XSS**.
+- ✅ **Medição:** O número de vulnerabilidades críticas deve ser a mínima possível antes do lançamento.
 - ✅ **Validação:** As vulnerabilidades encontradas serão corrigidas antes da liberação para produção.
 
 #### 3.3.4 Testes de Performance
 
 - ✅ **Objetivo:** Avaliar o desempenho e a escalabilidade do sistema.
-- ✅ **Como será feito:** Usando o **JMeter** para realizar testes de carga e simular acessos simultâneos ao sistema.
+- ✅ **Como será feito:** Usando ferramentas como **JMeter** (exemplo) para realizar testes de carga e simular acessos simultâneos ao sistema.
 - ✅ **Medição:** O tempo de resposta deve ser inferior a **2 segundos** mesmo com **1000 usuários simultâneos**.
 - ✅ **Validação:** O desempenho será monitorado e otimizado, se necessário, para garantir que a experiência do usuário não seja prejudicada.
 
